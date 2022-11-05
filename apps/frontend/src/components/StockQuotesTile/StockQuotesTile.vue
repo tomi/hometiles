@@ -39,6 +39,7 @@ export default defineComponent({
             data: stockData,
           };
         })
+        .sortBy((x) => x.ticker)
         .toArray();
     },
   },
