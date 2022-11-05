@@ -1,8 +1,12 @@
 # Hometiles
 
-## Deploy
+## Deploy api
 
-Deploying site
+```bash
+npm run deploy -w ./apps/api
+```
+
+## Deploy site
 
 ```bash
 # Build
