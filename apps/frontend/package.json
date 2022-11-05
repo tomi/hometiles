@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "fromfrom": "1.8.0",
+    "htmlparser2": "8.0.1",
     "vue": "^3.2.41"
   },
   "devDependencies": {
