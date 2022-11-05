@@ -3,7 +3,7 @@ import { AsyncEither } from "../../lib/Either";
 import { StockTickerData } from "./StockQuotesTile.types";
 
 export async function fetchTickerData(tickers: string[]): AsyncEither<Error, StockTickerData[]> {
-  const response = await fetch(`${apiBaseUrl}/?symbols=${tickers.join(",")}`);
+  const response = await fetch(`${apiBaseUrl}/stockSymbols?symbols=${tickers.join(",")}`);
 
   if (!response.ok) return [new Error(`Invalid response ${response.status}`), null];
 

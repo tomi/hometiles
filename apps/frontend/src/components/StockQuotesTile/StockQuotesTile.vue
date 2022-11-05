@@ -1,13 +1,15 @@
 <script lang="ts">
 import { from } from "fromfrom";
-import { loadTileState, storeTileState as persistTileState } from "../../lib/localStorage";
+import { defineComponent } from "vue";
+
+import { loadTileState, persistTileState } from "../../lib/localStorage";
 import { StocksByTicker, StockTickerData } from "./StockQuotesTile.types";
 import ModalDialog from "../ModalDialog/ModalDialog.vue";
 import { fetchTickerData } from "./StockQuoteApi";
 import IconRefresh from "~icons/mdi/refresh";
 import IconAdd from "~icons/mdi/plus-thick";
 import IconButton from "../IconButton/IconButton.vue";
-import { defineComponent } from "vue";
+import Tile from "../Tile/Tile.vue";
 
 const TILE_ID = "STOCK_QUOTE";
 
@@ -17,6 +19,7 @@ export default defineComponent({
     IconRefresh,
     IconAdd,
     IconButton,
+    Tile,
   },
 
   data() {
@@ -86,7 +89,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="rounded-md bg-gray-900 p-4">
+  <Tile>
     <div class="flex justify-end mb-2 text-gray-300 space-x-2">
       <IconButton label="Add" v-on:click="promptNewTicker">
         <IconAdd />
@@ -135,7 +138,7 @@ export default defineComponent({
         </button>
       </div>
     </ModalDialog>
-  </div>
+  </Tile>
 </template>
 
 <style scoped></style>

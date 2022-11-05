@@ -4,7 +4,7 @@ export const loadTileState = <T>(tileId: string): T | null => {
   return serializedState ? (JSON.parse(serializedState) as T) : null;
 };
 
-export const storeTileState = <T>(tileId: string, state: T) => {
+export const persistTileState = <T>(tileId: string, state: T) => {
   const serializedState = JSON.stringify(state);
 
   localStorage.setItem(tileId, serializedState);
