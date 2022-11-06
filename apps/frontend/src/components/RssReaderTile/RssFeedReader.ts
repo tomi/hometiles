@@ -2,7 +2,6 @@ import * as htmlparser2 from "htmlparser2";
 import { apiBaseUrl } from "../../config/config";
 
 export interface Feed {
-  url: string;
   title: string | undefined;
   items: FeedItem[];
 }
@@ -24,7 +23,6 @@ export async function fetchAndParseRss(rssUrl: string): Promise<Feed> {
   const feed = await htmlparser2.parseFeed(body);
 
   return {
-    url: rssUrl,
     title: feed?.title,
     items: feed?.items?.map(mapFeedItem) ?? [],
   };

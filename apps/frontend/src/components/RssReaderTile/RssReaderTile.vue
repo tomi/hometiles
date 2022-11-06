@@ -1,48 +1,30 @@
 <template>
   <Tile>
-    <div v-if="!feed">
+    <div v-if="!feedUrl">
       <p class="mb-4">Set up an RSS feed</p>
 
       <div class="flex flex-row space-x-4">
-        <input class="flex-grow p-1" type="text" placeholder="RSS URL" v-model="feedUrlToAdd" />
-        <button @click="loadRss">Add</button>
+        <input class="flex-grow p-1" type="text" placeholder="RSS URL" v-model="rssFeedUrlInput" />
+        <button @click="addRssFeed">Add</button>
       </div>
     </div>
-    <div v-else>
-      <h2>{{ feed.title }}</h2>
-      <div class="border-t border-t-gray-700 w-full my-1" />
-      <div class="space-y-2">
-        <div class="text-sm" v-for="item in itemsToDisplay">
-          <a class="text-white font-medium" v-bind:href="item.link" target="_blank">{{
-            item.title
-          }}</a>
-          <div class="text-xs">
-            {{
-              item.pubDate
-                ? new Intl.DateTimeFormat("en", {
-                    dateStyle: "medium",
-                    timeStyle: "medium",
-                    hour12: false,
-                  }).format(new Date(item.pubDate))
-                : ""
-            }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <RssReaderTileContent
+      v-else
+      :title="title ?? feed?.title"
+      :items="feed?.items"
+    ></RssReaderTileContent>
   </Tile>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import type * as htmlparser2 from "htmlparser2";
+import { computed, defineComponent, ref, watch } from "vue";
+import { useQuery } from "vue-query";
 
 import Tile from "../Tile/Tile.vue";
-import { Feed, FeedItem, fetchAndParseRss } from "./RssFeedReader";
-import { from } from "fromfrom";
-import { loadTileState, persistTileState } from "../../lib/localStorage";
-
-type RssReaderTileState = Feed;
+import { fetchAndParseRss, Iso8601Timestamp } from "./RssFeedReader";
+import { loadState, persistState } from "./RssReaderTileState";
+import { formatDateTime } from "../../lib/dateTimeFormatter";
+import RssReaderTileContent from "./RssReaderTileContent.vue";
 
 export default defineComponent({
   props: {
@@ -54,40 +36,52 @@ export default defineComponent({
 
   components: {
     Tile,
+    RssReaderTileContent,
   },
 
   data() {
     return {
-      feedUrlToAdd: "",
-      feed: null as Feed | null,
+      rssFeedUrlInput: "",
     };
   },
 
-  computed: {
-    itemsToDisplay(): FeedItem[] {
-      return from(this.feed?.items ?? [])
-        .take(5)
-        .sortByDescending((x) => x.pubDate)
-        .toArray();
-    },
-  },
-
   methods: {
-    async loadRss() {
-      const url = this.feedUrlToAdd;
-      const feed = await fetchAndParseRss(url);
-      if (feed) {
-        this.feed = feed;
-        persistTileState(this.tileId, feed);
-      }
+    async addRssFeed() {
+      this.feedUrl = this.rssFeedUrlInput;
+    },
+
+    formatDateTime(datetime?: Date | Iso8601Timestamp) {
+      return formatDateTime(datetime);
     },
   },
 
-  mounted() {
-    const loadedState = loadTileState<RssReaderTileState>(this.tileId);
-    if (loadedState) {
-      this.feed = loadedState;
-    }
+  setup(props) {
+    const state = loadState(props.tileId);
+    const feedUrl = ref(state.feedUrl);
+    const title = ref(state.title);
+
+    const {
+      isLoading,
+      isError,
+      isFetching,
+      data: feed,
+      error,
+    } = useQuery(["rssFeed", feedUrl], () => fetchAndParseRss(feedUrl.value!), {
+      enabled: computed(() => !!feedUrl.value),
+      staleTime: 5 * 60 * 1000,
+      initialData: state.feed,
+    });
+
+    watch(feed, (newFeed) => {
+      persistState(props.tileId, {
+        v: 3,
+        feed: newFeed,
+        feedUrl: feedUrl.value,
+        title: title.value,
+      });
+    });
+
+    return { feedUrl, title, isLoading, isError, isFetching, feed, error };
   },
 });
 </script>
