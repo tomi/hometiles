@@ -69,7 +69,7 @@ export default defineComponent({
     } = useQuery(["rssFeed", feedUrl], () => fetchAndParseRss(feedUrl.value!), {
       enabled: computed(() => !!feedUrl.value),
       staleTime: 5 * 60 * 1000,
-      initialData: state.feed,
+      placeholderData: state.feed,
     });
 
     watch(feed, (newFeed) => {
