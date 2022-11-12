@@ -1,26 +1,23 @@
 <template>
-  <Tile>
-    <div v-if="!feedUrl">
-      <p class="mb-4">Set up an RSS feed</p>
+  <div v-if="!feedUrl">
+    <p class="mb-4">Set up an RSS feed</p>
 
-      <div class="flex flex-row space-x-4">
-        <input class="flex-grow p-1" type="text" placeholder="RSS URL" v-model="rssFeedUrlInput" />
-        <button @click="addRssFeed">Add</button>
-      </div>
+    <div class="flex flex-row space-x-4">
+      <input class="flex-grow p-1" type="text" placeholder="RSS URL" v-model="rssFeedUrlInput" />
+      <button @click="addRssFeed">Add</button>
     </div>
-    <RssReaderTileContent
-      v-else
-      :title="title ?? feed?.title"
-      :items="feed?.items"
-    ></RssReaderTileContent>
-  </Tile>
+  </div>
+  <RssReaderTileContent
+    v-else
+    :title="title ?? feed?.title"
+    :items="feed?.items"
+  ></RssReaderTileContent>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from "vue";
 import { useQuery } from "vue-query";
 
-import Tile from "../Tile/Tile.vue";
 import { fetchAndParseRss, Iso8601Timestamp } from "./RssFeedReader";
 import { loadState, persistState } from "./RssReaderTileState";
 import { formatDateTime } from "../../lib/dateTimeFormatter";
@@ -35,7 +32,6 @@ export default defineComponent({
   },
 
   components: {
-    Tile,
     RssReaderTileContent,
   },
 

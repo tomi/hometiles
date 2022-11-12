@@ -1,5 +1,5 @@
 <template>
-  <button aria-label="label">
+  <button aria-label="label" :class="`flex ${className}`">
     <slot></slot>
   </button>
 </template>
@@ -10,6 +10,9 @@ export default {
     label: {
       type: String,
       required: true,
+    },
+    className: {
+      type: String,
     },
   },
 };
